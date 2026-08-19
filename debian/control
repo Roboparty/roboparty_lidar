@@ -1,0 +1,12 @@
+Source: roboparty-lidar
+Section: misc
+Priority: optional
+Maintainer: RoboParty <ZhihaoLiu_hit@163.com>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.6.0
+
+Package: roboparty-lidar
+Architecture: any
+Depends: roboparty-base (>= 1.0.0), ros-humble-rclcpp, ${misc:Depends}
+Description: RoboParty lidar driver (placeholder)
+ Placeholder package for the RoboParty lidar driver.
