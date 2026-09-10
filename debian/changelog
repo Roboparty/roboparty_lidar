@@ -1,3 +1,10 @@
+roboparty-lidar (0.1.1-1) stable; urgency=medium
+
+  * Make the placeholder package architecture-independent.
+  * Remove the ROS Humble runtime dependency.
+
+ -- wentywenty <2321901849@qq.com>  Thu, 10 Sep 2026 17:52:25 +0800
+
 roboparty-lidar (0.1.0-1) stable; urgency=medium
 
   * Initial empty package.
