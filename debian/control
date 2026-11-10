@@ -2,11 +2,14 @@ Source: roboparty-lidar
 Section: misc
 Priority: optional
 Maintainer: RoboParty <ZhihaoLiu_hit@163.com>
-Build-Depends: debhelper-compat (= 13)
+Build-Depends: debhelper-compat (= 13), cmake, ros-jazzy-ament-cmake
 Standards-Version: 4.6.0
 
 Package: roboparty-lidar
-Architecture: all
-Depends: roboparty-base (>= 1.0.0), ${misc:Depends}
-Description: RoboParty lidar driver (placeholder)
- Placeholder package for the RoboParty lidar driver.
+Architecture: any
+Depends: ${misc:Depends}, roboparty-base (>= 1.0.0), livox-ros-driver2,
+         iproute2, ros-jazzy-launch-ros, ros-jazzy-ament-index-python,
+         ros-jazzy-tf2-ros
+Description: RoboParty Livox MID-360 integration
+ ROS 2 integration package for the Livox MID-360, including MID-360
+ configuration, launch files, network setup and a systemd service.

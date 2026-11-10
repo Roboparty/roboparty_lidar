@@ -1,0 +1,14 @@
+build/
+log/
+obj-*/
+debian/tmp/
+debian/roboparty-lidar/
+debian/files
+debian/*.substvars
+debian/*.debhelper*
+debian/debhelper-build-stamp
+*.deb
+*.changes
+*.buildinfo
+__pycache__/
+*.pyc

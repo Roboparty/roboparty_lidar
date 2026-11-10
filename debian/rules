@@ -1,3 +1,36 @@
 #!/usr/bin/make -f
+
+INSTALL_PREFIX ?= /opt/roboparty
+export DH_VERBOSE = 1
+export DEB_BUILD_MAINT_OPTIONS = optimize=-lto
+ROS_DISTRO ?= jazzy
+ROS_SETUP ?= /opt/ros/$(ROS_DISTRO)
+export ROS_DISTRO
+export ROS_SETUP
+export AMENT_PREFIX_PATH = $(ROS_SETUP)
+export CMAKE_PREFIX_PATH = $(ROS_SETUP)
+
+PKG_NAME = roboparty-lidar
+
 %:
-	dh $@
+	dh $@ --buildsystem=cmake
+
+override_dh_auto_configure:
+	. $(ROS_SETUP)/setup.sh && dh_auto_configure -- \
+		-DCMAKE_INSTALL_PREFIX=$(INSTALL_PREFIX) \
+		-DCMAKE_PREFIX_PATH="$(ROS_SETUP)"
+
+override_dh_auto_install:
+	dh_auto_install
+	install -D -m 0755 scripts/roboparty-lidar-net debian/$(PKG_NAME)$(INSTALL_PREFIX)/bin/roboparty-lidar-net
+	install -D -m 0644 debian/roboparty-lidar-net.service debian/$(PKG_NAME)/lib/systemd/system/roboparty-lidar-net.service
+	install -D -m 0644 debian/roboparty-lidar.service debian/$(PKG_NAME)/lib/systemd/system/roboparty-lidar.service
+	sed -i 's|@ROS_DISTRO@|$(ROS_DISTRO)|g' debian/$(PKG_NAME)/lib/systemd/system/roboparty-lidar.service
+	install -D -m 0644 debian/roboparty-lidar.default debian/$(PKG_NAME)/etc/default/roboparty-lidar
+
+override_dh_auto_clean:
+	dh_auto_clean
+	rm -rf log
+
+override_dh_installsystemd:
+	dh_installsystemd --no-start

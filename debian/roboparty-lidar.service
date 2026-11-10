@@ -1,0 +1,20 @@
+[Unit]
+Description=RoboParty Livox MID-360 lidar driver
+After=network-online.target roboparty-lidar-net.service
+Wants=network-online.target roboparty-lidar-net.service
+
+[Service]
+Type=simple
+User=root
+EnvironmentFile=-/etc/default/roboparty-lidar
+EnvironmentFile=-/etc/roboos/env
+Environment=RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+ExecStart=/bin/bash -lc 'source "/opt/ros/@ROS_DISTRO@/setup.bash" && source "$$ROBOOS_PREFIX/setup.bash" && exec ros2 launch roboparty_lidar mid360.launch.py'
+Restart=on-failure
+RestartSec=2
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=roboparty-lidar
+
+[Install]
+WantedBy=multi-user.target

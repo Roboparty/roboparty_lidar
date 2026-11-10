@@ -1,0 +1,16 @@
+[Unit]
+Description=RoboParty Livox lidar network setup
+After=network.target
+Before=roboparty-lidar.service
+
+[Service]
+Type=oneshot
+EnvironmentFile=-/etc/default/roboparty-lidar
+EnvironmentFile=-/etc/roboos/env
+ExecStart=/bin/bash -lc 'exec "$$ROBOOS_PREFIX/bin/roboparty-lidar-net"'
+RemainAfterExit=yes
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

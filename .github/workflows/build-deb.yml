@@ -3,6 +3,9 @@ name: Build RoboParty Lidar Deb Package
 on:
   push:
 
+env:
+  ROS_DISTRO: ${{ vars.ROS_DISTRO || 'jazzy' }}
+
 jobs:
   build:
     strategy:
@@ -16,6 +19,21 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Version check (package.xml vs changelog)
+        run: |
+          PKG_XML_VERSION=$(grep -oP '<version>\K[^<]+' package.xml)
+          CHANGELOG_VERSION=$(head -1 debian/changelog | grep -oP '\((.*?)\)' | tr -d '()' | cut -d'-' -f1)
+
+          echo "package.xml version: $PKG_XML_VERSION"
+          echo "changelog version:  $CHANGELOG_VERSION"
+
+          if [ "$PKG_XML_VERSION" != "$CHANGELOG_VERSION" ]; then
+            echo "::error::Version mismatch! package.xml=$PKG_XML_VERSION, changelog=$CHANGELOG_VERSION"
+            exit 1
+          fi
+
+          echo "✅ Version check passed: $PKG_XML_VERSION"
 
       - name: Tag vs changelog version check
         if: startsWith(github.ref, 'refs/tags/v')
@@ -33,17 +51,25 @@ jobs:
 
           echo "✅ Tag matches changelog: v$TAG_VERSION"
 
+      - name: Setup ROS 2
+        if: matrix.arch == 'amd64'
+        uses: ros-tooling/setup-ros@v0.7
+        with:
+          required-ros-distributions: ${{ vars.ROS_DISTRO || 'jazzy' }}
+
       - name: Install build dependencies
         run: |
           sudo apt-get update -q
           sudo apt-get install -y --no-install-recommends \
-            build-essential dpkg-dev debhelper devscripts
+            build-essential cmake dpkg-dev debhelper devscripts \
+            ros-${ROS_DISTRO}-ament-cmake
 
       - name: Build deb package
         run: |
+          sed -i "s/ros-jazzy-/ros-${ROS_DISTRO}-/g" debian/control
+          . /opt/ros/${ROS_DISTRO}/setup.sh
           dpkg-buildpackage -us -uc -b
           mv ../*.deb .
-
           VERSION=$(dpkg-parsechangelog -S Version | cut -d'-' -f1 || echo "unknown")
           echo "PKG_VERSION=$VERSION" >> $GITHUB_ENV
 

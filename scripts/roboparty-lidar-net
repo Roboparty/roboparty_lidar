@@ -1,0 +1,26 @@
+#!/bin/bash
+set -euo pipefail
+
+if [[ "${LIDAR_CONFIGURE_NET:-0}" != "1" ]]; then
+	exit 0
+fi
+
+iface="${LIDAR_IF:-end0}"
+address="${LIDAR_HOST_IP:-192.168.1.50/24}"
+
+if [[ ! "${iface}" =~ ^[A-Za-z0-9_.:-]+$ ]]; then
+	echo "invalid LIDAR_IF: ${iface}" >&2
+	exit 1
+fi
+
+if [[ ! "${address}" =~ ^[0-9a-fA-F:.]+/[0-9]+$ ]]; then
+	echo "invalid LIDAR_HOST_IP: ${address}" >&2
+	exit 1
+fi
+
+if [[ ! -d "/sys/class/net/${iface}" ]]; then
+	exit 0
+fi
+
+ip link set dev "${iface}" up
+ip addr replace "${address}" dev "${iface}"
